@@ -42,11 +42,6 @@ fi
 echo "✓ Alte URI gefunden, Migration wird durchgeführt..."
 echo ""
 
-# Backup erstellen
-BACKUP_FILE="${SOURCE_FILE}.backup.$(date +%Y%m%d-%H%M%S)"
-echo "Erstelle Backup: $BACKUP_FILE"
-cp "$SOURCE_FILE" "$BACKUP_FILE"
-
 # URI austauschen
 echo "Tausche $OLD_URI gegen $NEW_URI aus..."
 sed -i "s|$OLD_URI|$NEW_URI|g" "$SOURCE_FILE"
@@ -54,7 +49,6 @@ sed -i "s|$OLD_URI|$NEW_URI|g" "$SOURCE_FILE"
 # Überprüfen ob die Änderung erfolgreich war
 if grep -q "$NEW_URI" "$SOURCE_FILE"; then
     echo "✓ Erfolgreich! Die URI wurde aktualisiert."
-    echo "Backup wurde gespeichert unter: $BACKUP_FILE"
     echo ""
     
     # Prüfen ob das neue Repository erreichbar ist
@@ -78,7 +72,5 @@ if grep -q "$NEW_URI" "$SOURCE_FILE"; then
     fi
 else
     echo "✗ Fehler: Die Änderung konnte nicht durchgeführt werden."
-    echo "Stelle Backup wieder her..."
-    cp "$BACKUP_FILE" "$SOURCE_FILE"
     exit 1
 fi
