@@ -3,22 +3,44 @@
 # Skript zum Austauschen der GuideOS Repository-URL
 # Ändert https://guideos.eu/repo zu https://repo.guideos.de
 
+echo "=========================================="
+echo "GuideOS Repository-Migration"
+echo "=========================================="
+echo ""
+
 SOURCE_FILE="/etc/apt/sources.list.d/guideos.sources"
 OLD_URI="https://guideos.eu/repo"
 NEW_URI="https://repo.guideos.de"
 
+echo "Prüfe Datei: $SOURCE_FILE"
+
 # Prüfen ob die Datei existiert
 if [ ! -f "$SOURCE_FILE" ]; then
-    echo "Fehler: Datei $SOURCE_FILE nicht gefunden!"
+    echo "✗ Fehler: Datei $SOURCE_FILE nicht gefunden!"
+    echo ""
+    echo "Mögliche Lösungen:"
+    echo "  - Überprüfen Sie, ob GuideOS bereits installiert ist"
+    echo "  - Suchen Sie nach ähnlichen Dateien: ls -la /etc/apt/sources.list.d/"
     exit 1
 fi
 
+echo "✓ Datei gefunden"
+echo ""
+
 # Prüfen ob die alte URI in der Datei vorhanden ist
+echo "Suche nach: $OLD_URI"
 if ! grep -q "$OLD_URI" "$SOURCE_FILE"; then
-    echo "Warnung: $OLD_URI wurde nicht in $SOURCE_FILE gefunden."
-    echo "Möglicherweise wurde die Änderung bereits durchgeführt."
+    echo "⚠ Warnung: $OLD_URI wurde nicht in $SOURCE_FILE gefunden."
+    echo ""
+    echo "Aktuelle Inhalte der Datei:"
+    cat "$SOURCE_FILE"
+    echo ""
+    echo "Die Migration wurde möglicherweise bereits durchgeführt."
     exit 0
 fi
+
+echo "✓ Alte URI gefunden, Migration wird durchgeführt..."
+echo ""
 
 # Backup erstellen
 BACKUP_FILE="${SOURCE_FILE}.backup.$(date +%Y%m%d-%H%M%S)"
