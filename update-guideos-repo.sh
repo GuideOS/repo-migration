@@ -33,6 +33,27 @@ sed -i "s|$OLD_URI|$NEW_URI|g" "$SOURCE_FILE"
 if grep -q "$NEW_URI" "$SOURCE_FILE"; then
     echo "✓ Erfolgreich! Die URI wurde aktualisiert."
     echo "Backup wurde gespeichert unter: $BACKUP_FILE"
+    echo ""
+    
+    # Prüfen ob das neue Repository erreichbar ist
+    echo "Prüfe Erreichbarkeit des neuen Repositories..."
+    if curl -s --head --max-time 10 "$NEW_URI" | head -n 1 | grep -q "HTTP/[0-9.]\+ [23].."; then
+        echo "✓ Repository $NEW_URI ist erreichbar."
+    else
+        echo "⚠ Warnung: Repository $NEW_URI ist möglicherweise nicht erreichbar."
+        echo "  Bitte überprüfen Sie Ihre Internetverbindung."
+    fi
+    
+    echo ""
+    echo "Aktualisiere Paketlisten..."
+    apt update
+    
+    if [ $? -eq 0 ]; then
+        echo "✓ Paketlisten erfolgreich aktualisiert."
+    else
+        echo "✗ Fehler beim Aktualisieren der Paketlisten."
+        exit 1
+    fi
 else
     echo "✗ Fehler: Die Änderung konnte nicht durchgeführt werden."
     echo "Stelle Backup wieder her..."
